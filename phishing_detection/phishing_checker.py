@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 from .feature import FeatureExtraction
 
-file = open("/Users/aung/project/python/phishing_detection_project/phishing_detection/gradient_boosting_model.pkl", "rb")
+file = open("gradient_boosting_model.pkl", "rb")
 gbc = pickle.load(file)
 file.close()
 
