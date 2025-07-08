@@ -3,6 +3,8 @@
 
 This project aims to detect phishing attacks using a machine learning model, built with the Django Python framework.
 
+![Web Interface](screenshot.png)
+
 ---
 
 ## 🔧 Setup Instructions
