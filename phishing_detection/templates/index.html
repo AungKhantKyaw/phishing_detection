@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing URL Detection</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Sticky footer styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .content {
+            flex: 1;
+        }
+        #loadingSpinner {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Phishing Detection</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Add any additional header links here -->
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content Section -->
+    <div class="wrapper">
+        <div class="container mt-5 content">
+            <h1 class="text-center mb-4">Phishing URL Detection</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <form id="urlForm">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input type="url" id="urlInput" class="form-control" placeholder="Enter URL..." required>
+                            <div class="input-group-append">
+                                <button type="button" id="checkBtn" class="btn btn-primary">Check</button>
+                            </div>
+                            <div class="input-group-append" style="padding-left:5px">
+                                <button type="button" id="resetBtn" class="btn btn-warning">Reset</button>
+                            </div>
+                            <div id="urlInputError" class="invalid-feedback">Please enter a valid URL starting with 'http://' or 'https://'</div>
+                        </div>
+                    </form>
+                    <div id="loadingSpinner" class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="result" class="text-center"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer py-3 bg-dark text-white">
+        <div class="container text-center">
+            <span>&copy; 2024 Phishing Detection</span>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#checkBtn').click(function(){
+                $('#result').html("");
+                var url = $('#urlInput').val();
+                
+                // Validate URL input
+                if (!validateURL(url)) {
+                    $('#urlInput').addClass('is-invalid');
+                    $('#urlInputError').text("Please enter a valid URL starting with 'http://' or 'https://'");
+                    return;
+                } else {
+                    $('#urlInput').removeClass('is-invalid');
+                    $('#urlInputError').text("");
+                }
+
+                var csrfToken = $('#urlForm input[name="csrfmiddlewaretoken"]').val();  // Get CSRF token from the form
+                
+                // Show loading spinner
+                $('#loadingSpinner').show();
+
+                // Disable Check button
+                $('#checkBtn').prop('disabled', true);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/check_url/',
+                    data: {
+                        'url': url,
+                        'csrfmiddlewaretoken': csrfToken  // Include CSRF token in the request
+                    },
+                    success: function(response){
+                        console.log(response);
+                        var result = '';
+                        if (response.prediction == 1) {
+                            result += "<p class='text-success'>The URL appears legitimate</p>";
+                        } else {
+                            result += "<p class='text-danger'>The URL appears suspicious</p>";
+                        }
+                        result += "<p>Phishing Probability: " + response.probability_phishing + "</p>";
+                        result += "<p>Non Phishing Probability: " + response.probability_non_phishing + "</p>";
+                        $('#result').html(result);
+                    },
+                    error: function(xhr, errmsg, err){
+                        $('#result').html("<p class='text-danger'>Error</p>");
+                    },
+                    complete: function(){
+                        // Hide loading spinner when request is complete
+                        $('#loadingSpinner').hide();
+                        // Enable Check button
+                        $('#checkBtn').prop('disabled', false);
+                    }
+                });
+            });
+
+            // Reset button click event
+            $('#resetBtn').click(function(){
+                $('#urlInput').val(''); // Clear the URL input field
+                $('#urlInput').removeClass('is-invalid');
+                $('#urlInputError').text("");
+                $('#result').html("");
+            });
+        });
+
+        // Function to validate URL
+        function validateURL(url) {
+            var pattern = /^(https?:\/\/)([\w-]+\.)*([\w-]+\.[a-zA-Z]{2,})/;
+            return pattern.test(url);
+        }
+    </script>
+</body>
+</html>
