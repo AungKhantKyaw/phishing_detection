@@ -1,11 +1,16 @@
 from django.conf import settings
 import numpy as np
+from pathlib import Path
 import pickle
 from .feature import FeatureExtraction
 
-file = open("gradient_boosting_model.pkl", "rb")
-gbc = pickle.load(file)
-file.close()
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "gradient_boosting_model.pkl"
+
+with open(MODEL_PATH, "rb") as file:
+    gbc = pickle.load(file)
+
 
 def predict_phishing(features):
     

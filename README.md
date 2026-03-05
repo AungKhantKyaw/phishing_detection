@@ -25,32 +25,15 @@ Make sure you have a `requirements.txt` file, then run:
 pip install -r requirements.txt
 ```
 
-### 4. Install Django (if not included in `requirements.txt`)
-```bash
-pip install django
-```
 
-### 5. Run the Django Development Server
+### 4. Run the Django Development Server
 ```bash
 python manage.py runserver
 ```
 
 ---
 
-## 📁 Project Structure (Optional)
-> Include this section if you'd like to show the file/folder layout.
-```
-phishing_detection/
-├── phishing_app/
-├── manage.py
-├── requirements.txt
-├── .venv/
-└── ...
-```
-
----
-
-## ✅ Notes
+## Notes
 - Ensure Python 3.7+ is installed.
 - Activate the virtual environment every time before development or running the server.
 - Contributions and suggestions are welcome!
